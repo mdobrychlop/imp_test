@@ -1,6 +1,8 @@
 import urllib.request
 import os
 from pathlib import Path
+import sys
+import subprocess
 
 def ensure_correct_workdir():
     current_dir = Path.cwd()
@@ -44,14 +46,23 @@ def ensure_correct_workdir():
 
     else:
         print(f"Working directory already correct: {current_dir}")
+        
+
+def download_if_missing(filename, url):
+    file_path = Path(filename)
+
+    if file_path.exists():
+        return
+
+    try:
+        urllib.request.urlretrieve(url, filename)
+    except Exception as e:
+        print(f"❌ Failed to download {filename}")
+        print(e)
 
 ensure_correct_workdir()
 
-print("📦 Preparing training environment...")
-
-# ============================
 # FILE LIST TO DOWNLOAD
-# ============================
 
 FILES = {
     "bootstrap.py": "https://raw.githubusercontent.com/mdobrychlop/imp_test/refs/heads/main/bootstrap.py",
@@ -63,33 +74,19 @@ FILES = {
     "requirements.txt" : "https://raw.githubusercontent.com/mdobrychlop/imp_test/refs/heads/main/requirements.txt",
 }
 
-# ============================
-# DOWNLOAD FUNCTION
-# ============================
-
-def download_if_missing(filename, url):
-    file_path = Path(filename)
-
-    if file_path.exists():
-        print(f"✅ {filename} already present")
-        return
-
-    print(f"⬇️  Downloading {filename}...")
-
-    try:
-        urllib.request.urlretrieve(url, filename)
-        print(f"✔️  Downloaded {filename}")
-    except Exception as e:
-        print(f"❌ Failed to download {filename}")
-        print(e)
-
-# ============================
-# MAIN LOOP
-# ============================
+print("Downloading files...")
 
 for fname, url in FILES.items():
     download_if_missing(fname, url)
 
-print("🎉 Bootstrap complete.")
+print("Downloads completed.")
 
-print(os.getcwd())
+print("Checking and installing dependencies...")
+
+subprocess.run(
+    [sys.executable, "-m", "pip", "install", "-q", "-r", "requirements.txt"],
+    check=True
+)
+
+print("Installs completed. You can now run the next cell to authenticate.")
+
