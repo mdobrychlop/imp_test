@@ -45,8 +45,52 @@ def ensure_correct_workdir():
 
     else:
         print(f"Working directory already correct: {current_dir}")
-        
 
-if __name__ == "__main__":
-    ensure_correct_workdir()
-    print(os.getcwd())
+ensure_correct_workdir()
+
+print("📦 Preparing training environment...")
+
+# ============================
+# FILE LIST TO DOWNLOAD
+# ============================
+
+FILES = {
+    "bootstrap.py": "https://raw.githubusercontent.com/mdobrychlop/imp_test/refs/heads/main/bootstrap.py",
+    "csv_graphs_utils.py" : "https://raw.githubusercontent.com/mdobrychlop/imp_test/refs/heads/main/csv_graphs_utils.py",
+    "ncdf_graph_utils.py" : "https://raw.githubusercontent.com/mdobrychlop/imp_test/refs/heads/main/ncdf_graph_utils.py",
+    "netcdf_utils.py" : "https://raw.githubusercontent.com/mdobrychlop/imp_test/refs/heads/main/netcdf_utils.py",
+    "openeo_utils.py" : "https://raw.githubusercontent.com/mdobrychlop/imp_test/refs/heads/main/openeo_utils.py",
+    "plot_utils.py" : "https://raw.githubusercontent.com/mdobrychlop/imp_test/refs/heads/main/plot_utils.py",
+    "requirements.txt" : "https://raw.githubusercontent.com/mdobrychlop/imp_test/refs/heads/main/requirements.txt",
+}
+
+# ============================
+# DOWNLOAD FUNCTION
+# ============================
+
+def download_if_missing(filename, url):
+    file_path = Path(filename)
+
+    if file_path.exists():
+        print(f"✅ {filename} already present")
+        return
+
+    print(f"⬇️  Downloading {filename}...")
+
+    try:
+        urllib.request.urlretrieve(url, filename)
+        print(f"✔️  Downloaded {filename}")
+    except Exception as e:
+        print(f"❌ Failed to download {filename}")
+        print(e)
+
+# ============================
+# MAIN LOOP
+# ============================
+
+for fname, url in FILES.items():
+    download_if_missing(fname, url)
+
+print("🎉 Bootstrap complete.")
+
+print(os.getcwd())
